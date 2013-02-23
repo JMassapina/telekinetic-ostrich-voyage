@@ -2,7 +2,13 @@
     //
     // Components
     //
-
+    Crafty.c('Ostrich', {
+        init: function() {
+            this.requires('2D, DOM, Color');
+            this.color('#f00');
+            
+        }
+    });
 
 
     //
@@ -58,7 +64,7 @@
     // The main game scene
     //
     Game.prototype.mainScene = function() {
-        // create a scoreboard
+        Crafty.e('Ostrich').attr({})
     };
     
     // kick off the game when the web page is ready
