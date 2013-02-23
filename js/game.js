@@ -4,10 +4,11 @@
     //
     Crafty.c('Ostrich', {
         init: function() {
-            this.requires('2D, DOM, Color, Keyboard, Collision');
+            this.requires('2D, DOM, Color, Keyboard, Collision, Delay');
             this.color('#f00');
             this.attr({w: 100, h: 100, x: 400, y: 300});
             this.baseY = this.y;
+            this.baseH = this.h;
             this.collision();
             this.bind('EnterFrame', function() {
                 if (this.y < this.baseY) {
@@ -18,6 +19,10 @@
                 if (e.key === Crafty.keys.SPACE) {
                     this.jump();
                 }
+
+                if (e.key === Crafty.keys.DOWN_ARROW) {
+                    this.duck();    
+                }
             });
             this.onHit('Obsticle', function() {
                 this.destroy();
@@ -25,6 +30,14 @@
         },
         jump: function() {
             this.y = this.baseY - 200;
+        },
+        duck: function() {
+            this.h = this.h - 30;
+            this.y = this.y + 30;
+            this.delay(function() {
+                this.h = this.baseH;
+                this.y = this.y - 30;
+            }, 1000);
         }
     });
 
@@ -43,6 +56,19 @@
         }
     });
 
+    Crafty.c('Bush', {
+        init: function() {
+            this.requires('Obsticle');
+            this.attr({x: 1024, y: 350});
+        }
+    });
+
+    Crafty.c('Branch', {
+        init: function() {
+            this.requires('Obsticle');
+            this.attr({x: 1024, y: 300});
+        }
+    });
 
     //
     // Game loading and initialisation
@@ -101,7 +127,11 @@
         Crafty.e('Ostrich');
 
         function createObsticle() {
-            Crafty.e('Obsticle').attr({x: 1024, y: 350}).bind('Remove', createObsticle);
+            Crafty.e('Bush')
+                .bind('Remove', function() {
+                    Crafty.e('Branch')
+                        .bind('Remove', createObsticle);
+                });
         }
 
         createObsticle();
