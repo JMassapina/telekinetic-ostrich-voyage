@@ -4,9 +4,42 @@
     //
     Crafty.c('Ostrich', {
         init: function() {
-            this.requires('2D, DOM, Color');
+            this.requires('2D, DOM, Color, Keyboard, Collision');
             this.color('#f00');
-            
+            this.attr({w: 100, h: 100, x: 400, y: 300});
+            this.baseY = this.y;
+            this.collision();
+            this.bind('EnterFrame', function() {
+                if (this.y < this.baseY) {
+                    this.y = this.y + 5;
+                }
+            });
+            this.bind('KeyDown', function(e) {
+                if (e.key === Crafty.keys.SPACE) {
+                    this.jump();
+                }
+            });
+            this.onHit('Obsticle', function() {
+                this.destroy();
+            });
+        },
+        jump: function() {
+            this.y = this.baseY - 200;
+        }
+    });
+
+    Crafty.c('Obsticle', {
+        init: function() {
+            this.requires('2D, DOM, Color, Delay, Collision');
+            this.attr({w: 30, h: 30});
+            this.collision();
+            this.color('#0f0');
+            this.bind('EnterFrame', function() {
+                this.x = this.x - 10;
+                if (this.x < 0) {
+                    this.destroy();
+                }
+            });
         }
     });
 
@@ -55,6 +88,7 @@
         
         Crafty.load([
             // list of images to load
+            'img/shooter-sprites.png'
         ], 
         onLoaded, onProgress, onError);
         
@@ -64,8 +98,15 @@
     // The main game scene
     //
     Game.prototype.mainScene = function() {
-        Crafty.e('Ostrich').attr({})
+        Crafty.e('Ostrich');
+
+        function createObsticle() {
+            Crafty.e('Obsticle').attr({x: 1024, y: 350}).bind('Remove', createObsticle);
+        }
+
+        createObsticle();
     };
+        
     
     // kick off the game when the web page is ready
     $(document).ready(function() {
